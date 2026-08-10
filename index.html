@@ -22,43 +22,61 @@
     padding-bottom:76px;
   }
   .app{max-width:480px;margin:0 auto;}
+  .hidden{display:none !important;}
 
-  /* Header */
+  /* ---------- Login overlay ---------- */
+  #loginOverlay{
+    position:fixed; inset:0; z-index:100; background:var(--grad); background-size:300% 300%;
+    animation:gradShift 12s ease infinite; display:flex; align-items:center; justify-content:center;
+    padding:22px;
+  }
+  .login-card{
+    background:#fff; border-radius:22px; padding:28px 24px; width:100%; max-width:380px;
+    box-shadow:0 20px 50px rgba(0,0,0,0.25);
+  }
+  .login-card .emoji{font-size:40px; text-align:center; margin-bottom:6px;}
+  .login-card h1{font-size:22px; text-align:center; margin:0 0 4px; font-weight:800;}
+  .login-card p.sub{text-align:center; color:var(--muted); font-size:13px; margin:0 0 22px;}
+  .login-card .field{margin-bottom:14px;}
+  .login-card .err{color:var(--red); font-size:12px; margin:-6px 0 12px; display:none;}
+
+  /* ---------- Header ---------- */
   .header{
     background:var(--grad); background-size:300% 300%; animation:gradShift 10s ease infinite;
     padding:16px 18px 26px; color:#fff; border-radius:0 0 26px 26px;
     box-shadow:0 8px 24px rgba(193,53,132,0.25);
   }
   @keyframes gradShift{0%{background-position:0% 50%;}50%{background-position:100% 50%;}100%{background-position:0% 50%;}}
-  .header-top{display:flex; justify-content:space-between; align-items:center;}
-  .brand{font-size:20px; font-weight:800; letter-spacing:0.3px;}
-  .brand span{opacity:.85; font-weight:500; font-size:12px; display:block; margin-top:1px;}
-  .clock{text-align:right;}
-  .clock .time{font-size:18px; font-weight:700; font-variant-numeric:tabular-nums; letter-spacing:0.5px;}
-  .clock .date{font-size:11px; opacity:.9; margin-top:2px;}
+  .header-top{display:flex; justify-content:space-between; align-items:center; gap:8px;}
+  .brand{font-size:19px; font-weight:800; letter-spacing:0.3px;}
+  .brand span{opacity:.85; font-weight:500; font-size:11px; display:block; margin-top:1px;}
+  .clock{text-align:right; flex-shrink:0;}
+  .clock .time{font-size:17px; font-weight:700; font-variant-numeric:tabular-nums; letter-spacing:0.5px;}
+  .clock .date{font-size:10px; opacity:.9; margin-top:2px;}
 
-  .balance-hero{margin-top:18px; text-align:center;}
+  .balance-hero{margin-top:16px; text-align:center;}
   .balance-hero .lbl{font-size:12px; opacity:.85; text-transform:uppercase; letter-spacing:1.5px;}
-  .balance-hero .amt{font-size:38px; font-weight:800; margin-top:4px; letter-spacing:-0.5px;}
+  .balance-hero .amt{font-size:36px; font-weight:800; margin-top:4px; letter-spacing:-0.5px; word-break:break-word;}
 
   .month-pill{
-    display:flex; align-items:center; justify-content:center; gap:8px; margin-top:14px;
+    display:flex; align-items:center; justify-content:center; gap:8px; margin-top:12px;
     background:rgba(255,255,255,0.18); backdrop-filter:blur(6px);
     padding:8px 14px; border-radius:20px; font-size:13px; font-weight:600;
   }
 
-  /* Content */
+  /* ---------- Content ---------- */
   .content{padding:16px;}
   .card{
     background:var(--card); border-radius:18px; padding:16px; margin-bottom:14px;
     box-shadow:0 2px 10px rgba(0,0,0,0.05); border:1px solid var(--line);
   }
-  .card h2{font-size:13px; text-transform:uppercase; letter-spacing:1px; color:var(--muted); margin:0 0 12px; font-weight:700;}
+  .card h2{font-size:13px; text-transform:uppercase; letter-spacing:1px; color:var(--muted); margin:0 0 12px; font-weight:700;
+    display:flex; align-items:center; justify-content:space-between;}
 
-  .stat-row{display:flex; gap:10px;}
-  .stat{flex:1; background:var(--bg); border-radius:14px; padding:12px; text-align:center;}
-  .stat .l{font-size:11px; color:var(--muted); text-transform:uppercase; letter-spacing:.5px;}
-  .stat .v{font-size:17px; font-weight:800; margin-top:3px;}
+  .stat-row{display:flex; gap:8px;}
+  .stat{flex:1; background:var(--bg); border-radius:14px; padding:10px 6px; text-align:center; min-width:0;}
+  .stat .l{font-size:10px; color:var(--muted); text-transform:uppercase; letter-spacing:.3px;}
+  .stat .v{font-size:15px; font-weight:800; margin-top:3px; word-break:break-word;}
   .stat.exp .v{color:var(--red);}
   .stat.net .v{background:var(--grad); -webkit-background-clip:text; background-clip:text; color:transparent;}
 
@@ -80,24 +98,27 @@
   .btn:active{transform:scale(0.98);}
   .btn.outline{background:none; color:var(--ig2); border:1.5px solid var(--ig2);}
   .btn.small{width:auto; padding:9px 16px; font-size:12px; border-radius:10px;}
+  .btn.link{
+    width:auto; background:none; color:var(--ig3); font-size:12px; font-weight:700; padding:0;
+  }
 
-  .row{display:flex; justify-content:space-between; align-items:center; padding:10px 0; border-bottom:1px solid var(--line);}
+  .row{display:flex; justify-content:space-between; align-items:center; padding:10px 0; border-bottom:1px solid var(--line); gap:8px;}
   .row:last-child{border-bottom:none;}
   .row .meta{font-size:11px; color:var(--muted); margin-top:2px;}
-  .row .item{font-weight:600; font-size:14px;}
-  .row .amt{font-weight:800; color:var(--red); font-size:14px;}
+  .row .item{font-weight:600; font-size:14px; word-break:break-word;}
+  .row .amt{font-weight:800; color:var(--red); font-size:14px; white-space:nowrap;}
   .row .del{background:none; border:none; color:var(--muted); font-size:16px; padding:0 0 0 10px; cursor:pointer;}
 
   .empty{text-align:center; padding:26px 10px; color:var(--muted); font-size:13px;}
 
-  /* Savings */
+  /* ---------- Savings ---------- */
   .save-total{
     background:var(--grad); border-radius:18px; padding:20px; text-align:center; color:#fff; margin-bottom:14px;
   }
   .save-total .l{font-size:12px; opacity:.9; text-transform:uppercase; letter-spacing:1px;}
-  .save-total .v{font-size:32px; font-weight:800; margin-top:4px;}
+  .save-total .v{font-size:32px; font-weight:800; margin-top:4px; word-break:break-word;}
 
-  /* Tab bar */
+  /* ---------- Tab bar ---------- */
   .tabbar{
     position:fixed; bottom:0; left:0; right:0; background:#fff; border-top:1px solid var(--line);
     display:flex; max-width:480px; margin:0 auto; padding:8px 4px calc(8px + env(safe-area-inset-bottom));
@@ -114,25 +135,68 @@
   .view.active{display:block;}
 
   .toast{
-    position:fixed; top:14px; left:50%; transform:translateX(-50%); z-index:60;
+    position:fixed; top:14px; left:50%; transform:translateX(-50%); z-index:80;
     background:#1c1c1e; color:#fff; padding:10px 18px; border-radius:20px; font-size:13px; font-weight:600;
-    opacity:0; pointer-events:none; transition:opacity .25s, top .25s;
+    opacity:0; pointer-events:none; transition:opacity .25s, top .25s; max-width:90%; text-align:center;
   }
   .toast.show{opacity:1; top:24px;}
 
-  .print-bar{display:flex; gap:10px;}
+  .print-bar{display:flex; gap:10px; flex-wrap:wrap;}
   .sync-dot{width:8px;height:8px;border-radius:50%; display:inline-block; margin-right:6px;}
   .sync-dot.on{background:#2ecc71;} .sync-dot.off{background:#ffb020;}
 
+  .profile-box{display:flex; align-items:center; gap:12px; margin-bottom:6px;}
+  .avatar{
+    width:46px; height:46px; border-radius:50%; background:var(--grad); color:#fff;
+    display:flex; align-items:center; justify-content:center; font-weight:800; font-size:18px; flex-shrink:0;
+  }
+  .profile-box .nm{font-weight:700; font-size:15px;}
+  .profile-box .em{font-size:12px; color:var(--muted); word-break:break-all;}
+
+  /* ---------- Modal (View More) ---------- */
+  .modal-overlay{
+    position:fixed; inset:0; background:rgba(0,0,0,0.45); z-index:70;
+    display:flex; align-items:flex-end; justify-content:center;
+  }
+  .modal-sheet{
+    background:#fff; width:100%; max-width:480px; border-radius:22px 22px 0 0;
+    max-height:80vh; display:flex; flex-direction:column; padding:16px 16px calc(16px + env(safe-area-inset-bottom));
+  }
+  .modal-head{display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;}
+  .modal-head h3{margin:0; font-size:15px; font-weight:800;}
+  .modal-close{background:var(--bg); border:none; width:30px; height:30px; border-radius:50%; font-size:15px; cursor:pointer; color:var(--muted);}
+  .modal-body{overflow-y:auto;}
+
   @media print{
-    .tabbar, .no-print{display:none !important;}
+    .tabbar, .no-print, #loginOverlay, .modal-overlay{display:none !important;}
     .header{border-radius:0; box-shadow:none;}
     body{padding-bottom:0;}
   }
 </style>
 </head>
 <body>
-<div class="app">
+
+<!-- ================= LOGIN (one time) ================= -->
+<div id="loginOverlay" class="hidden">
+  <div class="login-card">
+    <div class="emoji">💰</div>
+    <h1>Welcome to Khata</h1>
+    <p class="sub">Sign in once with your name &amp; email. Your data stays private to you.</p>
+    <div class="field">
+      <label>Full Name</label>
+      <input type="text" id="loginName" placeholder="e.g. Ali Raza" autocomplete="name">
+    </div>
+    <div class="field">
+      <label>Email</label>
+      <input type="email" id="loginEmail" placeholder="e.g. ali@email.com" autocomplete="email">
+    </div>
+    <div class="err" id="loginErr">Please enter a valid name and email.</div>
+    <button class="btn" id="loginBtn">Continue</button>
+  </div>
+</div>
+
+<!-- ================= APP ================= -->
+<div class="app hidden" id="mainApp">
 
   <div class="header">
     <div class="header-top">
@@ -157,7 +221,7 @@
       <div class="card">
         <h2>This Month</h2>
         <div class="stat-row">
-          <div class="stat"><div class="l">Salary</div><div class="v" id="statSalary">Rs 0</div></div>
+          <div class="stat"><div class="l">Credited</div><div class="v" id="statSalary">Rs 0</div></div>
           <div class="stat exp"><div class="l">Spent</div><div class="v" id="statExpense">Rs 0</div></div>
           <div class="stat net"><div class="l">Net</div><div class="v" id="statNet">Rs 0</div></div>
         </div>
@@ -183,7 +247,7 @@
       </div>
 
       <div class="card">
-        <h2>Credits This Month</h2>
+        <h2>Credits This Month <button class="btn link" id="viewMoreCredits">View More</button></h2>
         <div id="monthCreditList"></div>
         <div class="empty" id="monthCreditEmpty" style="display:none;">No money credited yet this month.</div>
       </div>
@@ -217,7 +281,7 @@
       </div>
 
       <div class="card">
-        <h2>This Month's Expenses</h2>
+        <h2>This Month's Expenses <button class="btn link" id="viewMoreExpenses">View More</button></h2>
         <div id="monthExpenseList"></div>
         <div class="empty" id="monthEmpty" style="display:none;">No expenses added yet this month.</div>
       </div>
@@ -237,7 +301,7 @@
         </div>
       </div>
       <div class="card">
-        <h2>Expense History</h2>
+        <h2>Full History</h2>
         <div id="historyList"></div>
         <div class="empty" id="historyEmpty" style="display:none;">No history found.</div>
       </div>
@@ -259,22 +323,25 @@
     <!-- SETTINGS -->
     <div class="view" id="view-settings">
       <div class="card no-print">
-        <h2>Google Sheets Sync</h2>
-        <div class="field">
-          <label><span class="sync-dot" id="syncDot"></span>Apps Script Web App URL</label>
-          <input type="text" id="sheetUrlInput" placeholder="https://script.google.com/macros/s/XXX/exec">
+        <h2>Your Account</h2>
+        <div class="profile-box">
+          <div class="avatar" id="avatarInitial">?</div>
+          <div>
+            <div class="nm" id="profileName">—</div>
+            <div class="em" id="profileEmail">—</div>
+          </div>
         </div>
-        <button class="btn" id="saveSheetUrlBtn">Connect</button>
-        <p style="font-size:12px;color:var(--muted);margin-top:12px;line-height:1.5;">
-          Deploy the included <b>google-apps-script.gs</b> as a Web App (see README.md), paste the resulting
-          URL above, then tap Connect. Your data is stored locally on this device and synced to your own
-          Google Sheet — nobody else can access it.
-        </p>
+        <div style="margin-top:14px; font-size:12px; color:var(--muted);">
+          <span class="sync-dot on"></span>Connected to your private sheet
+        </div>
       </div>
       <div class="card no-print">
         <h2>Manual Sync</h2>
-        <button class="btn outline" id="pullBtn" style="margin-bottom:10px;">Pull from Sheet</button>
-        <button class="btn outline" id="pushBtn">Push to Sheet</button>
+        <button class="btn outline" id="pullBtn" style="margin-bottom:10px;">Pull Latest From Sheet</button>
+        <button class="btn outline" id="pushBtn">Push Now</button>
+      </div>
+      <div class="card no-print">
+        <button class="btn outline" id="logoutBtn" style="border-color:var(--red); color:var(--red);">Log Out</button>
       </div>
     </div>
 
@@ -290,35 +357,43 @@
 
 <div class="toast" id="toast"></div>
 
+<!-- Modal template (View More) -->
+<div class="modal-overlay hidden" id="modalOverlay">
+  <div class="modal-sheet">
+    <div class="modal-head">
+      <h3 id="modalTitle">Details</h3>
+      <button class="modal-close" id="modalClose">✕</button>
+    </div>
+    <div class="modal-body" id="modalBody"></div>
+  </div>
+</div>
+
 <script>
+/* ======================================================
+   CONFIG — your permanent Google Apps Script Web App URL
+   ====================================================== */
+const SHEET_URL = 'https://script.google.com/macros/s/AKfycbxM7_pwmbineT53FSANu1mLMdpHB_hTIkTbKFC7cCt_WaCzWWp1q_jKoaNKFbTi3q3P-w/exec';
+
 /* ---------- State ---------- */
-const LS_KEY = 'khata_state_v2';
-const LS_SHEET_URL = 'khata_sheet_url';
-let state = { months: {}, savings: [] }; // months: {"2026-08":{credits:[{id,date,source,amount}], expenses:[{id,date,item,amount}]}}
-let sheetUrl = localStorage.getItem(LS_SHEET_URL) || '';
+const LS_KEY = 'khata_state_v3';
+const LS_USER = 'khata_user';
+let state = { months: {}, savings: [] };
+let currentUser = null; // {name, email}
 
 function loadLocal(){
   const raw = localStorage.getItem(LS_KEY);
   if(raw){ try{ state = JSON.parse(raw); }catch(e){} }
   if(!state.months) state.months = {};
   if(!state.savings) state.savings = [];
-  // migrate old single-salary format to credits array
-  Object.entries(state.months).forEach(([k,m])=>{
+  Object.values(state.months).forEach(m=>{
     if(!m.credits) m.credits = [];
-    if(typeof m.salary === 'number' && m.salary > 0){
-      m.credits.push({id:'c_migrated_'+k, date:k+'-01', source:'Salary', amount:m.salary});
-      delete m.salary;
-    }
     if(!m.expenses) m.expenses = [];
   });
 }
-function saveLocal(){
-  localStorage.setItem(LS_KEY, JSON.stringify(state));
-}
+function saveLocal(){ localStorage.setItem(LS_KEY, JSON.stringify(state)); }
 
 /* ---------- Helpers ---------- */
 function fmt(n){ return 'Rs ' + Math.round(n).toLocaleString('en-PK'); }
-function pad(n){ return n.toString().padStart(2,'0'); }
 function monthKey(dateStr){ return dateStr.slice(0,7); }
 function monthLabel(key){
   const [y,m]=key.split('-'); const d=new Date(+y,+m-1,1);
@@ -337,8 +412,9 @@ function showToast(msg){
   const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show');
   setTimeout(()=>t.classList.remove('show'),1800);
 }
+function escapeHtml(s){ const d=document.createElement('div'); d.textContent=s; return d.innerHTML; }
 
-/* ---------- Clock (Pakistan Standard Time, live seconds) ---------- */
+/* ---------- Clock ---------- */
 function tickClock(){
   const now = new Date();
   const time = new Intl.DateTimeFormat('en-GB',{timeZone:'Asia/Karachi',hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:false}).format(now);
@@ -364,6 +440,29 @@ function availableBalance(){ return totalSalaryAll() - totalExpenseAll() - total
 /* ---------- Render ---------- */
 let currentMonth = todayISOKarachi().slice(0,7);
 
+function creditRowHtml(c, withDelete){
+  return `<div class="row"><div><div class="item">${escapeHtml(c.source)}</div><div class="meta">${c.date}</div></div>
+    <div style="display:flex;align-items:center;"><span class="amt" style="color:#2ecc71;">${fmt(c.amount)}</span>
+    ${withDelete?`<button class="del no-print" data-id="${c.id}" data-month="${monthKey(c.date)}" data-kind="credit">✕</button>`:''}</div></div>`;
+}
+function expenseRowHtml(e, withDelete){
+  return `<div class="row"><div><div class="item">${escapeHtml(e.item)}</div><div class="meta">${e.date}</div></div>
+    <div style="display:flex;align-items:center;"><span class="amt">${fmt(e.amount)}</span>
+    ${withDelete?`<button class="del no-print" data-id="${e.id}" data-month="${monthKey(e.date)}" data-kind="expense">✕</button>`:''}</div></div>`;
+}
+
+function attachDeleteHandlers(container){
+  container.querySelectorAll('.del').forEach(b=>b.addEventListener('click', ()=>{
+    const mm = state.months[b.dataset.month];
+    if(!mm) return;
+    if(b.dataset.kind==='credit') mm.credits = mm.credits.filter(x=>x.id!==b.dataset.id);
+    else mm.expenses = mm.expenses.filter(x=>x.id!==b.dataset.id);
+    saveLocal(); render(); pushToSheet(true);
+    showToast('Removed');
+    closeModal();
+  }));
+}
+
 function render(){
   document.getElementById('monthPill').textContent = '📅 ' + monthLabel(currentMonth);
   document.getElementById('salaryMonthLabel').textContent = monthLabel(currentMonth);
@@ -376,47 +475,44 @@ function render(){
   document.getElementById('statExpense').textContent = fmt(spent);
   document.getElementById('statNet').textContent = fmt(credited-spent);
 
-  const creditList = document.getElementById('monthCreditList');
-  creditList.innerHTML='';
   const sortedCredits=[...m.credits].sort((a,b)=>b.date.localeCompare(a.date));
-  sortedCredits.forEach(c=>{
-    const row=document.createElement('div'); row.className='row';
-    row.innerHTML = `<div><div class="item">${escapeHtml(c.source)}</div><div class="meta">${c.date}</div></div>
-      <div style="display:flex;align-items:center;"><span class="amt" style="color:#2ecc71;">${fmt(c.amount)}</span>
-      <button class="del no-print" data-id="${c.id}" data-month="${currentMonth}">✕</button></div>`;
-    creditList.appendChild(row);
-  });
+  const creditList = document.getElementById('monthCreditList');
+  creditList.innerHTML = sortedCredits.slice(0,3).map(c=>creditRowHtml(c,true)).join('');
   document.getElementById('monthCreditEmpty').style.display = sortedCredits.length?'none':'block';
-  creditList.querySelectorAll('.del').forEach(b=>b.addEventListener('click', ()=>{
-    const mm = state.months[b.dataset.month];
-    mm.credits = mm.credits.filter(x=>x.id!==b.dataset.id);
-    saveLocal(); render(); pushToSheet(true);
-    showToast('Credit removed');
-  }));
+  document.getElementById('viewMoreCredits').style.display = sortedCredits.length>3 ? 'inline-block':'none';
+  attachDeleteHandlers(creditList);
 
+  const sortedExpenses=[...m.expenses].sort((a,b)=>b.date.localeCompare(a.date));
   const list = document.getElementById('monthExpenseList');
-  list.innerHTML='';
-  const sorted=[...m.expenses].sort((a,b)=>b.date.localeCompare(a.date));
-  sorted.forEach(e=>{
-    const row=document.createElement('div'); row.className='row';
-    row.innerHTML = `<div><div class="item">${escapeHtml(e.item)}</div><div class="meta">${e.date}</div></div>
-      <div style="display:flex;align-items:center;"><span class="amt">${fmt(e.amount)}</span>
-      <button class="del no-print" data-id="${e.id}" data-month="${currentMonth}">✕</button></div>`;
-    list.appendChild(row);
-  });
-  document.getElementById('monthEmpty').style.display = sorted.length?'none':'block';
-  list.querySelectorAll('.del').forEach(b=>b.addEventListener('click', async ()=>{
-    const mm = state.months[b.dataset.month];
-    mm.expenses = mm.expenses.filter(x=>x.id!==b.dataset.id);
-    saveLocal(); render(); pushToSheet(true);
-    showToast('Expense removed');
-  }));
+  list.innerHTML = sortedExpenses.slice(0,3).map(e=>expenseRowHtml(e,true)).join('');
+  document.getElementById('monthEmpty').style.display = sortedExpenses.length?'none':'block';
+  document.getElementById('viewMoreExpenses').style.display = sortedExpenses.length>3 ? 'inline-block':'none';
+  attachDeleteHandlers(list);
 
   renderHistory();
   renderSavings();
 }
 
-function escapeHtml(s){ const d=document.createElement('div'); d.textContent=s; return d.innerHTML; }
+document.getElementById('viewMoreCredits').addEventListener('click', ()=>{
+  const m = ensureMonth(currentMonth);
+  const sorted=[...m.credits].sort((a,b)=>b.date.localeCompare(a.date));
+  openModal('All Credits — ' + monthLabel(currentMonth), sorted.map(c=>creditRowHtml(c,true)).join('') || '<div class="empty">No credits yet.</div>');
+});
+document.getElementById('viewMoreExpenses').addEventListener('click', ()=>{
+  const m = ensureMonth(currentMonth);
+  const sorted=[...m.expenses].sort((a,b)=>b.date.localeCompare(a.date));
+  openModal('All Expenses — ' + monthLabel(currentMonth), sorted.map(e=>expenseRowHtml(e,true)).join('') || '<div class="empty">No expenses yet.</div>');
+});
+
+function openModal(title, html){
+  document.getElementById('modalTitle').textContent = title;
+  document.getElementById('modalBody').innerHTML = html;
+  attachDeleteHandlers(document.getElementById('modalBody'));
+  document.getElementById('modalOverlay').classList.remove('hidden');
+}
+function closeModal(){ document.getElementById('modalOverlay').classList.add('hidden'); }
+document.getElementById('modalClose').addEventListener('click', closeModal);
+document.getElementById('modalOverlay').addEventListener('click', (e)=>{ if(e.target.id==='modalOverlay') closeModal(); });
 
 function renderHistory(){
   const from=document.getElementById('printFrom').value;
@@ -525,59 +621,105 @@ document.querySelectorAll('.tabbtn').forEach(btn=>{
   btn.addEventListener('click', ()=>switchView(btn.dataset.view));
 });
 
-/* ---------- Google Sheets Sync ---------- */
-function updateSyncDot(){
-  document.getElementById('syncDot').className = 'sync-dot ' + (sheetUrl ? 'on':'off');
-}
-document.getElementById('sheetUrlInput').value = sheetUrl;
-updateSyncDot();
-
-document.getElementById('saveSheetUrlBtn').addEventListener('click', ()=>{
-  sheetUrl = document.getElementById('sheetUrlInput').value.trim();
-  localStorage.setItem(LS_SHEET_URL, sheetUrl);
-  updateSyncDot();
-  showToast(sheetUrl ? 'Connected to Google Sheet' : 'Disconnected');
-});
-
+/* ---------- Google Sheets Sync (per-user) ---------- */
 async function pushToSheet(silent){
-  if(!sheetUrl) return;
+  if(!currentUser) return;
   try{
-    await fetch(sheetUrl, {
+    await fetch(SHEET_URL, {
       method:'POST',
-      mode:'no-cors', // Apps Script web apps often need no-cors from browser fetch
+      mode:'no-cors',
       headers:{'Content-Type':'text/plain'},
-      body: JSON.stringify({action:'save', data: state})
+      body: JSON.stringify({action:'save', email: currentUser.email, name: currentUser.name, data: state})
     });
-    if(!silent) showToast('Pushed to Google Sheet');
+    if(!silent) showToast('Synced to your sheet');
   }catch(e){
-    if(!silent) showToast('Push failed — check URL');
+    if(!silent) showToast('Sync failed — check your connection');
   }
 }
-async function pullFromSheet(){
-  if(!sheetUrl){ showToast('Connect a Google Sheet URL first'); return; }
+async function pullFromSheet(silent){
+  if(!currentUser) return;
   try{
-    const res = await fetch(sheetUrl + '?action=load');
+    const url = SHEET_URL + '?action=load&email=' + encodeURIComponent(currentUser.email) + '&name=' + encodeURIComponent(currentUser.name);
+    const res = await fetch(url);
     const json = await res.json();
-    if(json && json.data){
+    if(json && json.ok && json.data){
       state = json.data;
       if(!state.months) state.months={};
       if(!state.savings) state.savings=[];
+      Object.values(state.months).forEach(m=>{
+        if(!m.credits) m.credits = [];
+        if(!m.expenses) m.expenses = [];
+      });
       saveLocal(); render();
-      showToast('Pulled from Google Sheet');
+      if(!silent) showToast('Pulled latest data');
     }
   }catch(e){
-    showToast('Pull failed — check URL');
+    if(!silent) showToast('Could not reach your sheet — showing local data');
   }
 }
 document.getElementById('pushBtn').addEventListener('click', ()=>pushToSheet(false));
-document.getElementById('pullBtn').addEventListener('click', pullFromSheet);
+document.getElementById('pullBtn').addEventListener('click', ()=>pullFromSheet(false));
+
+/* ---------- Login (one-time) ---------- */
+function initials(name){
+  return name.trim().split(/\s+/).slice(0,2).map(w=>w[0]?.toUpperCase()).join('') || '?';
+}
+function showApp(){
+  document.getElementById('loginOverlay').classList.add('hidden');
+  document.getElementById('mainApp').classList.remove('hidden');
+  document.getElementById('avatarInitial').textContent = initials(currentUser.name);
+  document.getElementById('profileName').textContent = currentUser.name;
+  document.getElementById('profileEmail').textContent = currentUser.email;
+}
+function showLogin(){
+  document.getElementById('mainApp').classList.add('hidden');
+  document.getElementById('loginOverlay').classList.remove('hidden');
+}
+
+document.getElementById('loginBtn').addEventListener('click', async ()=>{
+  const name = document.getElementById('loginName').value.trim();
+  const email = document.getElementById('loginEmail').value.trim();
+  const emailOk = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  if(!name || !emailOk){
+    document.getElementById('loginErr').style.display='block';
+    return;
+  }
+  document.getElementById('loginErr').style.display='none';
+  currentUser = { name, email };
+  localStorage.setItem(LS_USER, JSON.stringify(currentUser));
+  showApp();
+  showToast('Setting up your sheet…');
+  await pullFromSheet(true);
+  render();
+});
+
+document.getElementById('logoutBtn').addEventListener('click', ()=>{
+  localStorage.removeItem(LS_USER);
+  currentUser = null;
+  document.getElementById('loginName').value='';
+  document.getElementById('loginEmail').value='';
+  showLogin();
+});
 
 /* ---------- Init ---------- */
 loadLocal();
 tickClock();
-render();
 
-/* ---------- PWA service worker (optional, safe if file missing) ---------- */
+const savedUser = localStorage.getItem(LS_USER);
+if(savedUser){
+  try{
+    currentUser = JSON.parse(savedUser);
+    showApp();
+    render();
+    pullFromSheet(true);
+  }catch(e){
+    showLogin();
+  }
+}else{
+  showLogin();
+}
+
+/* ---------- PWA service worker ---------- */
 if('serviceWorker' in navigator){
   window.addEventListener('load', ()=>{
     navigator.serviceWorker.register('sw.js').catch(()=>{});
