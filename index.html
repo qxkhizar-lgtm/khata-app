@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#C13584">
+<title>Khata — Salary Tracker</title>
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>💰</text></svg>">
+<style>
+  :root{
+    --ig1:#833AB4; --ig2:#C13584; --ig3:#E1306C; --ig4:#FD1D1D; --ig5:#F77737; --ig6:#FCAF45;
+    --grad: linear-gradient(135deg, var(--ig1), var(--ig2), var(--ig3), var(--ig5), var(--ig6));
+    --bg:#FAFAFA; --card:#FFFFFF; --text:#1c1c1e; --muted:#8e8e93; --line:#EEEEEE;
+    --green:#2ecc71; --red:#E1306C;
+  }
+  *{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
+  html,body{height:100%;}
+  body{
+    margin:0; background:var(--bg); color:var(--text);
+    font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;
+    padding-bottom:76px;
+  }
+  .app{max-width:480px;margin:0 auto;}
+
+  /* Header */
+  .header{
+    background:var(--grad); background-size:300% 300%; animation:gradShift 10s ease infinite;
+    padding:16px 18px 26px; color:#fff; border-radius:0 0 26px 26px;
+    box-shadow:0 8px 24px rgba(193,53,132,0.25);
+  }
+  @keyframes gradShift{0%{background-position:0% 50%;}50%{background-position:100% 50%;}100%{background-position:0% 50%;}}
+  .header-top{display:flex; justify-content:space-between; align-items:center;}
+  .brand{font-size:20px; font-weight:800; letter-spacing:0.3px;}
+  .brand span{opacity:.85; font-weight:500; font-size:12px; display:block; margin-top:1px;}
+  .clock{text-align:right;}
+  .clock .time{font-size:18px; font-weight:700; font-variant-numeric:tabular-nums; letter-spacing:0.5px;}
+  .clock .date{font-size:11px; opacity:.9; margin-top:2px;}
+
+  .balance-hero{margin-top:18px; text-align:center;}
+  .balance-hero .lbl{font-size:12px; opacity:.85; text-transform:uppercase; letter-spacing:1.5px;}
+  .balance-hero .amt{font-size:38px; font-weight:800; margin-top:4px; letter-spacing:-0.5px;}
+
+  .month-pill{
+    display:flex; align-items:center; justify-content:center; gap:8px; margin-top:14px;
+    background:rgba(255,255,255,0.18); backdrop-filter:blur(6px);
+    padding:8px 14px; border-radius:20px; font-size:13px; font-weight:600;
+  }
+
+  /* Content */
+  .content{padding:16px;}
+  .card{
+    background:var(--card); border-radius:18px; padding:16px; margin-bottom:14px;
+    box-shadow:0 2px 10px rgba(0,0,0,0.05); border:1px solid var(--line);
+  }
+  .card h2{font-size:13px; text-transform:uppercase; letter-spacing:1px; color:var(--muted); margin:0 0 12px; font-weight:700;}
+
+  .stat-row{display:flex; gap:10px;}
+  .stat{flex:1; background:var(--bg); border-radius:14px; padding:12px; text-align:center;}
+  .stat .l{font-size:11px; color:var(--muted); text-transform:uppercase; letter-spacing:.5px;}
+  .stat .v{font-size:17px; font-weight:800; margin-top:3px;}
+  .stat.exp .v{color:var(--red);}
+  .stat.net .v{background:var(--grad); -webkit-background-clip:text; background-clip:text; color:transparent;}
+
+  label{display:block; font-size:12px; color:var(--muted); margin-bottom:6px; font-weight:600;}
+  input, select{
+    width:100%; padding:12px 14px; border:1.5px solid var(--line); border-radius:12px;
+    font-size:15px; background:var(--bg); color:var(--text);
+  }
+  input:focus, select:focus{outline:none; border-color:var(--ig3);}
+  .field{margin-bottom:12px;}
+  .grid2{display:grid; grid-template-columns:1fr 1fr; gap:10px;}
+
+  button{font-family:inherit;}
+  .btn{
+    width:100%; padding:14px; border:none; border-radius:14px; font-size:14px; font-weight:700;
+    color:#fff; background:var(--grad); background-size:200% 200%; cursor:pointer;
+    letter-spacing:.3px;
+  }
+  .btn:active{transform:scale(0.98);}
+  .btn.outline{background:none; color:var(--ig2); border:1.5px solid var(--ig2);}
+  .btn.small{width:auto; padding:9px 16px; font-size:12px; border-radius:10px;}
+
+  .row{display:flex; justify-content:space-between; align-items:center; padding:10px 0; border-bottom:1px solid var(--line);}
+  .row:last-child{border-bottom:none;}
+  .row .meta{font-size:11px; color:var(--muted); margin-top:2px;}
+  .row .item{font-weight:600; font-size:14px;}
+  .row .amt{font-weight:800; color:var(--red); font-size:14px;}
+  .row .del{background:none; border:none; color:var(--muted); font-size:16px; padding:0 0 0 10px; cursor:pointer;}
+
+  .empty{text-align:center; padding:26px 10px; color:var(--muted); font-size:13px;}
+
+  /* Savings */
+  .save-total{
+    background:var(--grad); border-radius:18px; padding:20px; text-align:center; color:#fff; margin-bottom:14px;
+  }
+  .save-total .l{font-size:12px; opacity:.9; text-transform:uppercase; letter-spacing:1px;}
+  .save-total .v{font-size:32px; font-weight:800; margin-top:4px;}
+
+  /* Tab bar */
+  .tabbar{
+    position:fixed; bottom:0; left:0; right:0; background:#fff; border-top:1px solid var(--line);
+    display:flex; max-width:480px; margin:0 auto; padding:8px 4px calc(8px + env(safe-area-inset-bottom));
+    z-index:20;
+  }
+  .tabbtn{
+    flex:1; background:none; border:none; display:flex; flex-direction:column; align-items:center; gap:3px;
+    padding:6px 0; font-size:10px; color:var(--muted); font-weight:700; letter-spacing:.3px; cursor:pointer;
+  }
+  .tabbtn .ic{font-size:19px;}
+  .tabbtn.active{color:var(--ig3);}
+
+  .view{display:none;}
+  .view.active{display:block;}
+
+  .toast{
+    position:fixed; top:14px; left:50%; transform:translateX(-50%); z-index:60;
+    background:#1c1c1e; color:#fff; padding:10px 18px; border-radius:20px; font-size:13px; font-weight:600;
+    opacity:0; pointer-events:none; transition:opacity .25s, top .25s;
+  }
+  .toast.show{opacity:1; top:24px;}
+
+  .print-bar{display:flex; gap:10px;}
+  .sync-dot{width:8px;height:8px;border-radius:50%; display:inline-block; margin-right:6px;}
+  .sync-dot.on{background:#2ecc71;} .sync-dot.off{background:#ffb020;}
+
+  @media print{
+    .tabbar, .no-print{display:none !important;}
+    .header{border-radius:0; box-shadow:none;}
+    body{padding-bottom:0;}
+  }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <div class="header">
+    <div class="header-top">
+      <div class="brand">Khata<span>Salary &amp; Expense Tracker</span></div>
+      <div class="clock">
+        <div class="time" id="clockTime">--:--:--</div>
+        <div class="date" id="clockDate">Loading…</div>
+      </div>
+    </div>
+    <div class="balance-hero">
+      <div class="lbl">Available Balance</div>
+      <div class="amt" id="availableBalance">Rs 0</div>
+    </div>
+    <div class="month-pill" id="monthPill">📅 —</div>
+  </div>
+
+  <div class="content">
+
+    <!-- DASHBOARD -->
+    <div class="view active" id="view-dashboard">
+
+      <div class="card">
+        <h2>This Month</h2>
+        <div class="stat-row">
+          <div class="stat"><div class="l">Salary</div><div class="v" id="statSalary">Rs 0</div></div>
+          <div class="stat exp"><div class="l">Spent</div><div class="v" id="statExpense">Rs 0</div></div>
+          <div class="stat net"><div class="l">Net</div><div class="v" id="statNet">Rs 0</div></div>
+        </div>
+      </div>
+
+      <div class="card no-print">
+        <h2>Credit Salary — <span id="salaryMonthLabel"></span></h2>
+        <div class="field">
+          <label>Salary Amount (Rs)</label>
+          <input type="number" id="salaryInput" placeholder="e.g. 80000" min="0" inputmode="decimal">
+        </div>
+        <button class="btn" id="saveSalaryBtn">Save Salary</button>
+      </div>
+
+      <div class="card no-print">
+        <h2>Add Expense</h2>
+        <div class="field">
+          <label>Item</label>
+          <input type="text" id="itemInput" placeholder="e.g. Groceries">
+        </div>
+        <div class="grid2">
+          <div class="field">
+            <label>Amount (Rs)</label>
+            <input type="number" id="amountInput" placeholder="2500" min="0" inputmode="decimal">
+          </div>
+          <div class="field">
+            <label>Date</label>
+            <input type="date" id="dateInput">
+          </div>
+        </div>
+        <button class="btn" id="addExpenseBtn">Add Expense</button>
+      </div>
+
+      <div class="card no-print">
+        <h2>Move Balance to Savings</h2>
+        <div class="field">
+          <label>Amount to Save (Rs)</label>
+          <input type="number" id="saveAmountInput" placeholder="Amount from available balance" min="0" inputmode="decimal">
+        </div>
+        <button class="btn outline" id="moveToSavingsBtn">Save This Amount</button>
+      </div>
+
+      <div class="card">
+        <h2>This Month's Expenses</h2>
+        <div id="monthExpenseList"></div>
+        <div class="empty" id="monthEmpty" style="display:none;">No expenses added yet this month.</div>
+      </div>
+    </div>
+
+    <!-- HISTORY -->
+    <div class="view" id="view-history">
+      <div class="card no-print">
+        <h2>Print Range</h2>
+        <div class="grid2">
+          <div class="field"><label>From</label><input type="date" id="printFrom"></div>
+          <div class="field"><label>To</label><input type="date" id="printTo"></div>
+        </div>
+        <div class="print-bar">
+          <button class="btn small" id="printBtn">🖨 Print</button>
+          <button class="btn outline small" id="clearFilterBtn">Clear</button>
+        </div>
+      </div>
+      <div class="card">
+        <h2>Expense History</h2>
+        <div id="historyList"></div>
+        <div class="empty" id="historyEmpty" style="display:none;">No history found.</div>
+      </div>
+    </div>
+
+    <!-- SAVINGS -->
+    <div class="view" id="view-savings">
+      <div class="save-total">
+        <div class="l">Total Savings</div>
+        <div class="v" id="totalSavings">Rs 0</div>
+      </div>
+      <div class="card">
+        <h2>Savings History</h2>
+        <div id="savingsList"></div>
+        <div class="empty" id="savingsEmpty" style="display:none;">No savings recorded yet.</div>
+      </div>
+    </div>
+
+    <!-- SETTINGS -->
+    <div class="view" id="view-settings">
+      <div class="card no-print">
+        <h2>Google Sheets Sync</h2>
+        <div class="field">
+          <label><span class="sync-dot" id="syncDot"></span>Apps Script Web App URL</label>
+          <input type="text" id="sheetUrlInput" placeholder="https://script.google.com/macros/s/XXX/exec">
+        </div>
+        <button class="btn" id="saveSheetUrlBtn">Connect</button>
+        <p style="font-size:12px;color:var(--muted);margin-top:12px;line-height:1.5;">
+          Deploy the included <b>google-apps-script.gs</b> as a Web App (see README.md), paste the resulting
+          URL above, then tap Connect. Your data is stored locally on this device and synced to your own
+          Google Sheet — nobody else can access it.
+        </p>
+      </div>
+      <div class="card no-print">
+        <h2>Manual Sync</h2>
+        <button class="btn outline" id="pullBtn" style="margin-bottom:10px;">Pull from Sheet</button>
+        <button class="btn outline" id="pushBtn">Push to Sheet</button>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="tabbar no-print">
+    <button class="tabbtn active" data-view="dashboard"><span class="ic">🏠</span>Home</button>
+    <button class="tabbtn" data-view="history"><span class="ic">📜</span>History</button>
+    <button class="tabbtn" data-view="savings"><span class="ic">💎</span>Savings</button>
+    <button class="tabbtn" data-view="settings"><span class="ic">⚙️</span>Settings</button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ---------- State ---------- */
+const LS_KEY = 'khata_state_v2';
+const LS_SHEET_URL = 'khata_sheet_url';
+let state = { months: {}, savings: [] }; // months: {"2026-08":{salary:0, expenses:[{id,date,item,amount}]}}
+let sheetUrl = localStorage.getItem(LS_SHEET_URL) || '';
+
+function loadLocal(){
+  const raw = localStorage.getItem(LS_KEY);
+  if(raw){ try{ state = JSON.parse(raw); }catch(e){} }
+  if(!state.months) state.months = {};
+  if(!state.savings) state.savings = [];
+}
+function saveLocal(){
+  localStorage.setItem(LS_KEY, JSON.stringify(state));
+}
+
+/* ---------- Helpers ---------- */
+function fmt(n){ return 'Rs ' + Math.round(n).toLocaleString('en-PK'); }
+function pad(n){ return n.toString().padStart(2,'0'); }
+function monthKey(dateStr){ return dateStr.slice(0,7); }
+function monthLabel(key){
+  const [y,m]=key.split('-'); const d=new Date(+y,+m-1,1);
+  return d.toLocaleString('en-US',{month:'long',year:'numeric'});
+}
+function todayISOKarachi(){
+  const parts = new Intl.DateTimeFormat('en-CA',{timeZone:'Asia/Karachi',year:'numeric',month:'2-digit',day:'2-digit'}).formatToParts(new Date());
+  const o={}; parts.forEach(p=>o[p.type]=p.value);
+  return `${o.year}-${o.month}-${o.day}`;
+}
+function ensureMonth(key){
+  if(!state.months[key]) state.months[key] = {salary:0, expenses:[]};
+  return state.months[key];
+}
+function showToast(msg){
+  const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),1800);
+}
+
+/* ---------- Clock (Pakistan Standard Time, live seconds) ---------- */
+function tickClock(){
+  const now = new Date();
+  const time = new Intl.DateTimeFormat('en-GB',{timeZone:'Asia/Karachi',hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:false}).format(now);
+  const date = new Intl.DateTimeFormat('en-GB',{timeZone:'Asia/Karachi',weekday:'short',day:'2-digit',month:'short',year:'numeric'}).format(now);
+  document.getElementById('clockTime').textContent = time + ' PKT';
+  document.getElementById('clockDate').textContent = date;
+
+  const newMonth = todayISOKarachi().slice(0,7);
+  if(newMonth !== currentMonth){
+    currentMonth = newMonth;
+    render();
+    showToast('New month started: ' + monthLabel(currentMonth));
+  }
+}
+setInterval(tickClock, 1000);
+
+/* ---------- Derived totals ---------- */
+function totalSalaryAll(){ return Object.values(state.months).reduce((s,m)=>s+(m.salary||0),0); }
+function totalExpenseAll(){ return Object.values(state.months).reduce((s,m)=>s+m.expenses.reduce((a,e)=>a+e.amount,0),0); }
+function totalSavingsAll(){ return state.savings.reduce((s,x)=>s+x.amount,0); }
+function availableBalance(){ return totalSalaryAll() - totalExpenseAll() - totalSavingsAll(); }
+
+/* ---------- Render ---------- */
+let currentMonth = todayISOKarachi().slice(0,7);
+
+function render(){
+  document.getElementById('monthPill').textContent = '📅 ' + monthLabel(currentMonth);
+  document.getElementById('salaryMonthLabel').textContent = monthLabel(currentMonth);
+  document.getElementById('availableBalance').textContent = fmt(availableBalance());
+
+  const m = ensureMonth(currentMonth);
+  document.getElementById('salaryInput').value = m.salary || '';
+  const spent = m.expenses.reduce((a,e)=>a+e.amount,0);
+  document.getElementById('statSalary').textContent = fmt(m.salary||0);
+  document.getElementById('statExpense').textContent = fmt(spent);
+  document.getElementById('statNet').textContent = fmt((m.salary||0)-spent);
+
+  const list = document.getElementById('monthExpenseList');
+  list.innerHTML='';
+  const sorted=[...m.expenses].sort((a,b)=>b.date.localeCompare(a.date));
+  sorted.forEach(e=>{
+    const row=document.createElement('div'); row.className='row';
+    row.innerHTML = `<div><div class="item">${escapeHtml(e.item)}</div><div class="meta">${e.date}</div></div>
+      <div style="display:flex;align-items:center;"><span class="amt">${fmt(e.amount)}</span>
+      <button class="del no-print" data-id="${e.id}" data-month="${currentMonth}">✕</button></div>`;
+    list.appendChild(row);
+  });
+  document.getElementById('monthEmpty').style.display = sorted.length?'none':'block';
+  list.querySelectorAll('.del').forEach(b=>b.addEventListener('click', async ()=>{
+    const mm = state.months[b.dataset.month];
+    mm.expenses = mm.expenses.filter(x=>x.id!==b.dataset.id);
+    saveLocal(); render(); pushToSheet(true);
+    showToast('Expense removed');
+  }));
+
+  renderHistory();
+  renderSavings();
+}
+
+function escapeHtml(s){ const d=document.createElement('div'); d.textContent=s; return d.innerHTML; }
+
+function renderHistory(){
+  const from=document.getElementById('printFrom').value;
+  const to=document.getElementById('printTo').value;
+  let all=[];
+  Object.entries(state.months).forEach(([k,m])=>{
+    m.expenses.forEach(e=>all.push(e));
+  });
+  if(from) all=all.filter(e=>e.date>=from);
+  if(to) all=all.filter(e=>e.date<=to);
+  all.sort((a,b)=>b.date.localeCompare(a.date));
+  const list=document.getElementById('historyList'); list.innerHTML='';
+  all.forEach(e=>{
+    const row=document.createElement('div'); row.className='row';
+    row.innerHTML=`<div><div class="item">${escapeHtml(e.item)}</div><div class="meta">${monthLabel(monthKey(e.date))}</div></div>
+      <div><span class="amt">${fmt(e.amount)}</span></div>`;
+    list.appendChild(row);
+  });
+  document.getElementById('historyEmpty').style.display = all.length?'none':'block';
+}
+
+function renderSavings(){
+  document.getElementById('totalSavings').textContent = fmt(totalSavingsAll());
+  const list=document.getElementById('savingsList'); list.innerHTML='';
+  const sorted=[...state.savings].sort((a,b)=>b.date.localeCompare(a.date));
+  sorted.forEach(s=>{
+    const row=document.createElement('div'); row.className='row';
+    row.innerHTML=`<div><div class="item">${monthLabel(s.month)}</div><div class="meta">Saved on ${s.date}</div></div>
+      <div><span class="amt" style="color:#2ecc71;">${fmt(s.amount)}</span></div>`;
+    list.appendChild(row);
+  });
+  document.getElementById('savingsEmpty').style.display = sorted.length?'none':'block';
+}
+
+/* ---------- Actions ---------- */
+document.getElementById('saveSalaryBtn').addEventListener('click', ()=>{
+  const val=parseFloat(document.getElementById('salaryInput').value);
+  if(isNaN(val)||val<0){ showToast('Enter a valid salary amount'); return; }
+  ensureMonth(currentMonth).salary = val;
+  saveLocal(); render(); pushToSheet(true);
+  showToast('Salary saved for ' + monthLabel(currentMonth));
+});
+
+document.getElementById('dateInput').value = todayISOKarachi();
+
+document.getElementById('addExpenseBtn').addEventListener('click', ()=>{
+  const item=document.getElementById('itemInput').value.trim();
+  const amount=parseFloat(document.getElementById('amountInput').value);
+  const date=document.getElementById('dateInput').value || todayISOKarachi();
+  if(!item){ showToast('Enter an item name'); return; }
+  if(isNaN(amount)||amount<=0){ showToast('Enter a valid amount'); return; }
+  const mk=monthKey(date);
+  ensureMonth(mk).expenses.push({id:'e_'+Date.now()+'_'+Math.random().toString(36).slice(2,7), date, item, amount});
+  saveLocal();
+  document.getElementById('itemInput').value='';
+  document.getElementById('amountInput').value='';
+  document.getElementById('dateInput').value = todayISOKarachi();
+  currentMonth = mk;
+  render(); pushToSheet(true);
+  showToast('Expense added');
+});
+
+document.getElementById('moveToSavingsBtn').addEventListener('click', ()=>{
+  const amount=parseFloat(document.getElementById('saveAmountInput').value);
+  if(isNaN(amount)||amount<=0){ showToast('Enter a valid amount'); return; }
+  if(amount > availableBalance()){ showToast('Amount exceeds available balance'); return; }
+  state.savings.push({id:'s_'+Date.now(), month:currentMonth, amount, date: todayISOKarachi()});
+  saveLocal();
+  document.getElementById('saveAmountInput').value='';
+  render(); pushToSheet(true);
+  showToast('Moved to savings');
+});
+
+document.getElementById('printFrom').addEventListener('change', renderHistory);
+document.getElementById('printTo').addEventListener('change', renderHistory);
+document.getElementById('clearFilterBtn').addEventListener('click', ()=>{
+  document.getElementById('printFrom').value='';
+  document.getElementById('printTo').value='';
+  renderHistory();
+});
+document.getElementById('printBtn').addEventListener('click', ()=>{
+  switchView('history');
+  window.print();
+});
+
+/* ---------- Tabs ---------- */
+function switchView(name){
+  document.querySelectorAll('.tabbtn').forEach(b=>b.classList.toggle('active', b.dataset.view===name));
+  document.querySelectorAll('.view').forEach(v=>v.classList.toggle('active', v.id==='view-'+name));
+}
+document.querySelectorAll('.tabbtn').forEach(btn=>{
+  btn.addEventListener('click', ()=>switchView(btn.dataset.view));
+});
+
+/* ---------- Google Sheets Sync ---------- */
+function updateSyncDot(){
+  document.getElementById('syncDot').className = 'sync-dot ' + (sheetUrl ? 'on':'off');
+}
+document.getElementById('sheetUrlInput').value = sheetUrl;
+updateSyncDot();
+
+document.getElementById('saveSheetUrlBtn').addEventListener('click', ()=>{
+  sheetUrl = document.getElementById('sheetUrlInput').value.trim();
+  localStorage.setItem(LS_SHEET_URL, sheetUrl);
+  updateSyncDot();
+  showToast(sheetUrl ? 'Connected to Google Sheet' : 'Disconnected');
+});
+
+async function pushToSheet(silent){
+  if(!sheetUrl) return;
+  try{
+    await fetch(sheetUrl, {
+      method:'POST',
+      mode:'no-cors', // Apps Script web apps often need no-cors from browser fetch
+      headers:{'Content-Type':'text/plain'},
+      body: JSON.stringify({action:'save', data: state})
+    });
+    if(!silent) showToast('Pushed to Google Sheet');
+  }catch(e){
+    if(!silent) showToast('Push failed — check URL');
+  }
+}
+async function pullFromSheet(){
+  if(!sheetUrl){ showToast('Connect a Google Sheet URL first'); return; }
+  try{
+    const res = await fetch(sheetUrl + '?action=load');
+    const json = await res.json();
+    if(json && json.data){
+      state = json.data;
+      if(!state.months) state.months={};
+      if(!state.savings) state.savings=[];
+      saveLocal(); render();
+      showToast('Pulled from Google Sheet');
+    }
+  }catch(e){
+    showToast('Pull failed — check URL');
+  }
+}
+document.getElementById('pushBtn').addEventListener('click', ()=>pushToSheet(false));
+document.getElementById('pullBtn').addEventListener('click', pullFromSheet);
+
+/* ---------- Init ---------- */
+loadLocal();
+tickClock();
+render();
+
+/* ---------- PWA service worker (optional, safe if file missing) ---------- */
+if('serviceWorker' in navigator){
+  window.addEventListener('load', ()=>{
+    navigator.serviceWorker.register('sw.js').catch(()=>{});
+  });
+}
+</script>
+</body>
+</html>
