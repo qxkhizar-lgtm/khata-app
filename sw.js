@@ -1,7 +1,7 @@
 // Bump this version string every time you push new code to index.html.
 // Changing it forces every device to fetch fresh files instead of using
 // whatever was cached before.
-const CACHE_VERSION = 'v2';
+const CACHE_VERSION = 'v3';
 const CACHE_NAME = 'khata-cache-' + CACHE_VERSION;
 const ASSETS = ['./', './index.html', './manifest.json'];
 
