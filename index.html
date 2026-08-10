@@ -164,12 +164,28 @@
       </div>
 
       <div class="card no-print">
-        <h2>Credit Salary — <span id="salaryMonthLabel"></span></h2>
+        <h2>Credit Money — <span id="salaryMonthLabel"></span></h2>
         <div class="field">
-          <label>Salary Amount (Rs)</label>
-          <input type="number" id="salaryInput" placeholder="e.g. 80000" min="0" inputmode="decimal">
+          <label>Source</label>
+          <input type="text" id="creditSourceInput" placeholder="e.g. Salary, Bonus, Freelance">
         </div>
-        <button class="btn" id="saveSalaryBtn">Save Salary</button>
+        <div class="grid2">
+          <div class="field">
+            <label>Amount (Rs)</label>
+            <input type="number" id="creditAmountInput" placeholder="e.g. 80000" min="0" inputmode="decimal">
+          </div>
+          <div class="field">
+            <label>Date</label>
+            <input type="date" id="creditDateInput">
+          </div>
+        </div>
+        <button class="btn" id="addCreditBtn">Add Credit</button>
+      </div>
+
+      <div class="card">
+        <h2>Credits This Month</h2>
+        <div id="monthCreditList"></div>
+        <div class="empty" id="monthCreditEmpty" style="display:none;">No money credited yet this month.</div>
       </div>
 
       <div class="card no-print">
@@ -278,7 +294,7 @@
 /* ---------- State ---------- */
 const LS_KEY = 'khata_state_v2';
 const LS_SHEET_URL = 'khata_sheet_url';
-let state = { months: {}, savings: [] }; // months: {"2026-08":{salary:0, expenses:[{id,date,item,amount}]}}
+let state = { months: {}, savings: [] }; // months: {"2026-08":{credits:[{id,date,source,amount}], expenses:[{id,date,item,amount}]}}
 let sheetUrl = localStorage.getItem(LS_SHEET_URL) || '';
 
 function loadLocal(){
@@ -286,6 +302,15 @@ function loadLocal(){
   if(raw){ try{ state = JSON.parse(raw); }catch(e){} }
   if(!state.months) state.months = {};
   if(!state.savings) state.savings = [];
+  // migrate old single-salary format to credits array
+  Object.entries(state.months).forEach(([k,m])=>{
+    if(!m.credits) m.credits = [];
+    if(typeof m.salary === 'number' && m.salary > 0){
+      m.credits.push({id:'c_migrated_'+k, date:k+'-01', source:'Salary', amount:m.salary});
+      delete m.salary;
+    }
+    if(!m.expenses) m.expenses = [];
+  });
 }
 function saveLocal(){
   localStorage.setItem(LS_KEY, JSON.stringify(state));
@@ -305,7 +330,7 @@ function todayISOKarachi(){
   return `${o.year}-${o.month}-${o.day}`;
 }
 function ensureMonth(key){
-  if(!state.months[key]) state.months[key] = {salary:0, expenses:[]};
+  if(!state.months[key]) state.months[key] = {credits:[], expenses:[]};
   return state.months[key];
 }
 function showToast(msg){
@@ -331,7 +356,7 @@ function tickClock(){
 setInterval(tickClock, 1000);
 
 /* ---------- Derived totals ---------- */
-function totalSalaryAll(){ return Object.values(state.months).reduce((s,m)=>s+(m.salary||0),0); }
+function totalSalaryAll(){ return Object.values(state.months).reduce((s,m)=>s+(m.credits||[]).reduce((a,c)=>a+c.amount,0),0); }
 function totalExpenseAll(){ return Object.values(state.months).reduce((s,m)=>s+m.expenses.reduce((a,e)=>a+e.amount,0),0); }
 function totalSavingsAll(){ return state.savings.reduce((s,x)=>s+x.amount,0); }
 function availableBalance(){ return totalSalaryAll() - totalExpenseAll() - totalSavingsAll(); }
@@ -345,11 +370,29 @@ function render(){
   document.getElementById('availableBalance').textContent = fmt(availableBalance());
 
   const m = ensureMonth(currentMonth);
-  document.getElementById('salaryInput').value = m.salary || '';
+  const credited = m.credits.reduce((a,c)=>a+c.amount,0);
   const spent = m.expenses.reduce((a,e)=>a+e.amount,0);
-  document.getElementById('statSalary').textContent = fmt(m.salary||0);
+  document.getElementById('statSalary').textContent = fmt(credited);
   document.getElementById('statExpense').textContent = fmt(spent);
-  document.getElementById('statNet').textContent = fmt((m.salary||0)-spent);
+  document.getElementById('statNet').textContent = fmt(credited-spent);
+
+  const creditList = document.getElementById('monthCreditList');
+  creditList.innerHTML='';
+  const sortedCredits=[...m.credits].sort((a,b)=>b.date.localeCompare(a.date));
+  sortedCredits.forEach(c=>{
+    const row=document.createElement('div'); row.className='row';
+    row.innerHTML = `<div><div class="item">${escapeHtml(c.source)}</div><div class="meta">${c.date}</div></div>
+      <div style="display:flex;align-items:center;"><span class="amt" style="color:#2ecc71;">${fmt(c.amount)}</span>
+      <button class="del no-print" data-id="${c.id}" data-month="${currentMonth}">✕</button></div>`;
+    creditList.appendChild(row);
+  });
+  document.getElementById('monthCreditEmpty').style.display = sortedCredits.length?'none':'block';
+  creditList.querySelectorAll('.del').forEach(b=>b.addEventListener('click', ()=>{
+    const mm = state.months[b.dataset.month];
+    mm.credits = mm.credits.filter(x=>x.id!==b.dataset.id);
+    saveLocal(); render(); pushToSheet(true);
+    showToast('Credit removed');
+  }));
 
   const list = document.getElementById('monthExpenseList');
   list.innerHTML='';
@@ -380,7 +423,8 @@ function renderHistory(){
   const to=document.getElementById('printTo').value;
   let all=[];
   Object.entries(state.months).forEach(([k,m])=>{
-    m.expenses.forEach(e=>all.push(e));
+    m.expenses.forEach(e=>all.push({...e, kind:'expense', label:e.item}));
+    m.credits.forEach(c=>all.push({...c, kind:'credit', label:c.source}));
   });
   if(from) all=all.filter(e=>e.date>=from);
   if(to) all=all.filter(e=>e.date<=to);
@@ -388,8 +432,10 @@ function renderHistory(){
   const list=document.getElementById('historyList'); list.innerHTML='';
   all.forEach(e=>{
     const row=document.createElement('div'); row.className='row';
-    row.innerHTML=`<div><div class="item">${escapeHtml(e.item)}</div><div class="meta">${monthLabel(monthKey(e.date))}</div></div>
-      <div><span class="amt">${fmt(e.amount)}</span></div>`;
+    const sign = e.kind==='credit' ? '+' : '−';
+    const color = e.kind==='credit' ? '#2ecc71' : 'var(--red)';
+    row.innerHTML=`<div><div class="item">${escapeHtml(e.label)}</div><div class="meta">${monthLabel(monthKey(e.date))} · ${e.date}</div></div>
+      <div><span class="amt" style="color:${color};">${sign} ${fmt(e.amount)}</span></div>`;
     list.appendChild(row);
   });
   document.getElementById('historyEmpty').style.display = all.length?'none':'block';
@@ -409,12 +455,23 @@ function renderSavings(){
 }
 
 /* ---------- Actions ---------- */
-document.getElementById('saveSalaryBtn').addEventListener('click', ()=>{
-  const val=parseFloat(document.getElementById('salaryInput').value);
-  if(isNaN(val)||val<0){ showToast('Enter a valid salary amount'); return; }
-  ensureMonth(currentMonth).salary = val;
-  saveLocal(); render(); pushToSheet(true);
-  showToast('Salary saved for ' + monthLabel(currentMonth));
+document.getElementById('creditDateInput').value = todayISOKarachi();
+
+document.getElementById('addCreditBtn').addEventListener('click', ()=>{
+  const source=document.getElementById('creditSourceInput').value.trim();
+  const amount=parseFloat(document.getElementById('creditAmountInput').value);
+  const date=document.getElementById('creditDateInput').value || todayISOKarachi();
+  if(!source){ showToast('Enter a source (e.g. Salary)'); return; }
+  if(isNaN(amount)||amount<=0){ showToast('Enter a valid amount'); return; }
+  const mk=monthKey(date);
+  ensureMonth(mk).credits.push({id:'c_'+Date.now()+'_'+Math.random().toString(36).slice(2,7), date, source, amount});
+  saveLocal();
+  document.getElementById('creditSourceInput').value='';
+  document.getElementById('creditAmountInput').value='';
+  document.getElementById('creditDateInput').value = todayISOKarachi();
+  currentMonth = mk;
+  render(); pushToSheet(true);
+  showToast('Amount credited — ' + fmt(amount));
 });
 
 document.getElementById('dateInput').value = todayISOKarachi();
