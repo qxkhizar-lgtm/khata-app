@@ -656,9 +656,13 @@ async function pullFromSheet(silent){
       });
       saveLocal(); render();
       if(!silent) showToast('Pulled latest data');
+    }else{
+      // Sync reached the server but something's wrong (e.g. old script deployed) — always tell the user
+      showToast('⚠️ Sync issue: ' + (json && json.error ? json.error : 'unexpected response — check your Apps Script deployment'));
     }
   }catch(e){
-    if(!silent) showToast('Could not reach your sheet — showing local data');
+    // Always surface this, even on the silent auto-pull — a silent failure is how stale data goes unnoticed
+    showToast('⚠️ Could not reach your sheet — showing last saved data on this device');
   }
 }
 document.getElementById('pushBtn').addEventListener('click', ()=>pushToSheet(false));
