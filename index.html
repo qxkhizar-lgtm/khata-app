@@ -412,6 +412,11 @@ function showToast(msg){
   setTimeout(()=>t.classList.remove('show'),1800);
 }
 function escapeHtml(s){ const d=document.createElement('div'); d.textContent=s; return d.innerHTML; }
+function isValidEntry(e){
+  // Filters out junk/test rows: needs a real positive amount and a proper YYYY-MM-DD date
+  return e && typeof e.amount === 'number' && e.amount > 0 &&
+    typeof e.date === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(e.date);
+}
 
 /* ---------- Clock ---------- */
 function tickClock(){
@@ -431,8 +436,8 @@ function tickClock(){
 setInterval(tickClock, 1000);
 
 /* ---------- Derived totals ---------- */
-function totalSalaryAll(){ return Object.values(state.months).reduce((s,m)=>s+(m.credits||[]).reduce((a,c)=>a+c.amount,0),0); }
-function totalExpenseAll(){ return Object.values(state.months).reduce((s,m)=>s+m.expenses.reduce((a,e)=>a+e.amount,0),0); }
+function totalSalaryAll(){ return Object.values(state.months).reduce((s,m)=>s+(m.credits||[]).filter(isValidEntry).reduce((a,c)=>a+c.amount,0),0); }
+function totalExpenseAll(){ return Object.values(state.months).reduce((s,m)=>s+(m.expenses||[]).filter(isValidEntry).reduce((a,e)=>a+e.amount,0),0); }
 function totalSavingsAll(){ return state.savings.reduce((s,x)=>s+x.amount,0); }
 function availableBalance(){ return totalSalaryAll() - totalExpenseAll() - totalSavingsAll(); }
 
@@ -474,14 +479,14 @@ function render(){
   document.getElementById('statExpense').textContent = fmt(spent);
   document.getElementById('statNet').textContent = fmt(credited-spent);
 
-  const sortedCredits=[...m.credits].sort((a,b)=>b.date.localeCompare(a.date));
+  const sortedCredits=[...m.credits].filter(isValidEntry).sort((a,b)=>b.date.localeCompare(a.date));
   const creditList = document.getElementById('monthCreditList');
   creditList.innerHTML = sortedCredits.slice(0,3).map(c=>creditRowHtml(c,true)).join('');
   document.getElementById('monthCreditEmpty').style.display = sortedCredits.length?'none':'block';
   document.getElementById('viewMoreCredits').style.display = sortedCredits.length>3 ? 'inline-block':'none';
   attachDeleteHandlers(creditList);
 
-  const sortedExpenses=[...m.expenses].sort((a,b)=>b.date.localeCompare(a.date));
+  const sortedExpenses=[...m.expenses].filter(isValidEntry).sort((a,b)=>b.date.localeCompare(a.date));
   const list = document.getElementById('monthExpenseList');
   list.innerHTML = sortedExpenses.slice(0,3).map(e=>expenseRowHtml(e,true)).join('');
   document.getElementById('monthEmpty').style.display = sortedExpenses.length?'none':'block';
@@ -494,12 +499,12 @@ function render(){
 
 document.getElementById('viewMoreCredits').addEventListener('click', ()=>{
   const m = ensureMonth(currentMonth);
-  const sorted=[...m.credits].sort((a,b)=>b.date.localeCompare(a.date));
+  const sorted=[...m.credits].filter(isValidEntry).sort((a,b)=>b.date.localeCompare(a.date));
   openModal('All Credits — ' + monthLabel(currentMonth), sorted.map(c=>creditRowHtml(c,true)).join('') || '<div class="empty">No credits yet.</div>');
 });
 document.getElementById('viewMoreExpenses').addEventListener('click', ()=>{
   const m = ensureMonth(currentMonth);
-  const sorted=[...m.expenses].sort((a,b)=>b.date.localeCompare(a.date));
+  const sorted=[...m.expenses].filter(isValidEntry).sort((a,b)=>b.date.localeCompare(a.date));
   openModal('All Expenses — ' + monthLabel(currentMonth), sorted.map(e=>expenseRowHtml(e,true)).join('') || '<div class="empty">No expenses yet.</div>');
 });
 
@@ -518,8 +523,8 @@ function renderHistory(){
   const to=document.getElementById('printTo').value;
   let all=[];
   Object.entries(state.months).forEach(([k,m])=>{
-    m.expenses.forEach(e=>all.push({...e, kind:'expense', label:e.item}));
-    m.credits.forEach(c=>all.push({...c, kind:'credit', label:c.source}));
+    m.expenses.filter(isValidEntry).forEach(e=>all.push({...e, kind:'expense', label:e.item}));
+    m.credits.filter(isValidEntry).forEach(c=>all.push({...c, kind:'credit', label:c.source}));
   });
   if(from) all=all.filter(e=>e.date>=from);
   if(to) all=all.filter(e=>e.date<=to);
